@@ -1,0 +1,236 @@
+/* ── Wrapper ── */
+.skill-orbit-wrapper {
+  position: absolute;
+  right: 4%;
+  top: 50%;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  z-index: 20;
+  /* translateY(-50%) is set inline via Landing.css media query */
+}
+
+.skill-orbit-wrapper.orbit-visible {
+  opacity: 1;
+}
+
+.orbit-visible .orbit-icon-inner {
+  pointer-events: auto;
+}
+
+.orbit-scaler {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* ── Center "Skills" text ── */
+.orbit-center {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(100, 255, 218, 0.07);
+  border: 2px solid rgba(100, 255, 218, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  box-shadow: 0 0 30px rgba(100, 255, 218, 0.35), 0 0 60px rgba(100, 255, 218, 0.15);
+  animation: centerPulse 3s ease-in-out infinite;
+}
+
+.orbit-center-label {
+  color: #64ffda;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(100, 255, 218, 0.8);
+}
+
+@keyframes centerPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(100,255,218,0.35), 0 0 60px rgba(100,255,218,0.15); }
+  50%       { box-shadow: 0 0 50px rgba(100,255,218,0.6),  0 0 100px rgba(100,255,218,0.3); }
+}
+
+/* ── Orbit rings ── */
+.orbit-ring {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border: 1px solid rgba(100, 255, 218, 0.12);
+  border-radius: 50%;
+  animation: ringRotate 22s linear infinite;
+}
+
+.orbit-ring-2 {
+  width: 240px;
+  height: 240px;
+  border-color: rgba(100, 255, 218, 0.07);
+  animation-duration: 16s;
+  animation-direction: reverse;
+}
+
+@keyframes ringRotate {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Each orbit slot ── */
+.orbit-icon {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transform: rotate(var(--angle));
+  animation: orbitSpin 20s linear infinite;
+  /* no per-icon delay on the spin, so the spacing stays perfectly even */
+  animation-delay: 0s;
+}
+
+@keyframes orbitSpin {
+  from { transform: rotate(var(--angle)); }
+  to   { transform: rotate(calc(var(--angle) + 360deg)); }
+}
+
+/* ── Icon box ── */
+.orbit-icon-inner {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  transform: translateX(-50%) rotate(calc(-1 * var(--angle)));
+  background: rgba(15, 15, 35, 0.88);
+  border: 1px solid rgba(100, 255, 218, 0.25);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  animation: counterSpin 20s linear infinite;
+  animation-delay: 0s;
+}
+
+@keyframes counterSpin {
+  from { transform: translateX(-50%) rotate(calc(-1 * var(--angle))); }
+  to   { transform: translateX(-50%) rotate(calc(-1 * (var(--angle) + 360deg))); }
+}
+
+/* Uses the `scale` property so it doesn't override the counter-rotation */
+.orbit-icon-inner:hover {
+  border-color: #64ffda;
+  box-shadow: 0 0 18px rgba(100, 255, 218, 0.55);
+  scale: 1.25;
+}
+
+.orbit-icon-inner img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(100, 255, 218, 0.35));
+}
+
+/* Dark logos (Kafka, MySQL) → render white so they show on the dark tile */
+.orbit-icon-inner img.icon-light {
+  filter: brightness(0) invert(1) drop-shadow(0 0 4px rgba(100, 255, 218, 0.35));
+}
+
+/* ── Tooltip ── */
+.orbit-tooltip {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 15, 35, 0.95);
+  color: #64ffda;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.orbit-icon-inner:hover .orbit-tooltip {
+  opacity: 1;
+}
+
+/* ── Pop-in when scan completes ── */
+/* popIn animates `scale`/opacity only — animating `transform` here used to
+   override counterSpin and leave the icons tilted */
+.orbit-visible .orbit-icon-inner {
+  animation: counterSpin 20s linear infinite, popIn 0.5s ease-out backwards;
+  animation-delay: 0s, var(--delay); /* stagger only the pop-in */
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; scale: 0; }
+  70%  { opacity: 1; scale: 1.2; }
+  100% { opacity: 1; scale: 1; }
+}
+
+/* ── Responsive: compact badge top-right, clear of the character ── */
+@media (max-width: 1024px) {
+  .skill-orbit-wrapper {
+    position: absolute;
+    right: 0;
+    left: auto;
+    top: 10%;
+    margin: 0;
+    width: 400px;
+    height: 400px;
+  }
+  .orbit-scaler {
+    transform-origin: top right;
+  }
+}
+
+@media (max-width: 599px) {
+  .skill-orbit-wrapper {
+    top: 15%;
+  }
+}
+
+/* ── Bigger ring on desktop (scales with screen width, capped) ── */
+@media (min-width: 1025px) {
+  /* bigger ring, same-size icons -> more space between icons.
+     More specific selector so it wins over Landing.css's position rule. */
+  .landing-container .skill-orbit-wrapper {
+    width: clamp(420px, 31vw, 600px);
+    height: clamp(420px, 31vw, 600px);
+    right: -1%;
+  }
+  /* Outer circle runs through the icon centres; inner circle keeps its size */
+  .orbit-ring {
+    width: calc(100% - 52px);
+    height: calc(100% - 52px);
+    border-color: rgba(100, 255, 218, 0.16);
+  }
+  .orbit-ring-2 {
+    width: 60%;
+    height: 60%;
+  }
+  .orbit-center {
+    width: 120px;
+    height: 120px;
+  }
+  .orbit-center-label {
+    font-size: 20px;
+  }
+}
